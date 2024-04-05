@@ -74,8 +74,10 @@ class Blockchain(object):
         })
         return self.last_block['index'] + 1
 
-    def add_supply_item(self, item, send, receive):
+# this is the update request for a specific item on our new chain 
+    def add_supply_item(self,index, item, send, receive):
         self.supply_chain.append({
+            'index':index,
             'item': item,
             'send': send,
             'receive': receive
