@@ -74,6 +74,13 @@ class Blockchain(object):
         })
         return self.last_block['index'] + 1
 
+    def add_supply_item(self, item, send, receive):
+        self.supply_chain.append({
+            'item': item,
+            'send': send,
+            'receive': receive
+        })
+
     @property
     def last_block(self):
         return self.chain[-1]
