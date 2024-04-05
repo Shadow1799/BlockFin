@@ -11,7 +11,7 @@ import hashlib
 import json
 from time import time
 from uuid import uuid4
-from flask import Flask,redirect,url_for,render_template
+from flask import Flask,url_for,render_template
 from flask.globals import request
 from flask.json import jsonify
 
@@ -86,7 +86,8 @@ node_identifier = str(uuid4()).replace('-', "")
 blockchain = Blockchain()
 
 @app.route('/')
-def index():
+@app.route('/index')
+def home():
     return render_template('index.html')
 
 # routes --> /admissions /scholarship
@@ -96,7 +97,12 @@ def full_chain():
         'chain': blockchain.chain,
         'length': len(blockchain.chain)
     }
-    return jsonify(response), 200
+
+    return render_template(
+        "Block.html",
+        calltype = "full_chain",
+        calldata = jsonify(response)
+    ),200
 
 
 @app.route('/mine', methods=['GET'])
@@ -120,7 +126,11 @@ def mine_block():
     }
     end = time()
     print(end-start)
-    return jsonify(response), 200
+    return render_template(
+        "Block.html",
+        calltype="full_chain",
+        calldata=response
+    ),200
 
 
 @app.route('/transaction/new', methods=['POST'])
