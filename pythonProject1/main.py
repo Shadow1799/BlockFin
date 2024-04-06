@@ -13,7 +13,7 @@ from time import time
 from uuid import uuid4
 from flask import Flask,url_for,render_template
 from flask.globals import request
-from flask.json import jsonify
+
 
 
 # First block --> Genesis block
@@ -26,7 +26,7 @@ class Blockchain(object):
         # For the genesis block, the previous block hash is set to '0'
         genesis_block = {
             'index': 0,
-            'transactions': [],
+            #'transactions': [],
             'timestamp': time(),
             'nonce': 0,
             'Previous_block_hash': '0'  # Previous block hash set to '0'
@@ -74,14 +74,14 @@ class Blockchain(object):
         })
         return self.last_block['index'] + 1
 
-# this is the update request for a specific item on our new chain 
-    def add_supply_item(self,index, item, send, receive):
-        self.supply_chain.append({
-            'index':index,
+# this is the update request for a specific item on our new chain
+    def add_supply_item(self, item, send, receive):
+        self.current_transaction.append({
             'item': item,
             'send': send,
             'receive': receive
         })
+        return self.last_block['index'] + 1
 
     @property
     def last_block(self):
@@ -110,7 +110,7 @@ def full_chain():
     return render_template(
         "Block.html",
         calltype = "full_chain",
-        calldata = jsonify(response)
+        calldata = response
     ),200
 
 
@@ -141,21 +141,20 @@ def mine_block():
         calldata=response
     ),200
 
-
-@app.route('/transaction/new', methods=['POST'])
+@app.route('/supitem', methods=["POST"])
 def new_transactions():
-    values = request.get_json()
-    required_fields = ['sender', 'recipient', 'amount']  # corrected 'receipient' to 'recipient'
-    if not all(k in values for k in required_fields):
-        return 'Missing Fields', 400
-    index = blockchain.add_transaction(
-        values['sender'],
-        values['recipient'],  # corrected 'receipient' to 'recipient'
-        values['amount']
-    )
-    response = {'message': f'Transaction will be added to the block {index}'}
-    return jsonify(response), 200
 
+        index = blockchain.add_supply_item(
+            request.form['item'],
+            request.form['send'],
+            request.form['receive']
+        )
+        response = {'message': f'Transaction will be added to the block {index}'}
+        return render_template(
+            "Block.html",
+            calltype="full_chain",
+            calldata=response
+        ), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
